@@ -1,0 +1,36 @@
+#################
+#	Plugin YML	#
+#################
+
+# Required information
+name: CFCore
+version: 1.0
+main: com.coldfyre.CFCore
+author: Sommod
+
+# Optional Information
+description: Library Plugin
+api-version: 1.20.5
+load: STARTUP
+prefix: CFCore
+
+# Permissions
+permissions:
+	cfcore.*:
+		default: false
+		description: OP permission that grants access to all other permissions.
+		children:
+			cfcore.reload: true
+			cfcore.list: true
+	
+	cfcore.reload:
+		default: false
+		description: Reloads this plugin without the need to restart the server.
+		
+# Commands
+commands:
+	cfcore:
+		description: Command to operate this Library plugin.
+		permission-message: 'You do not possess the permission(s) to perform this command.'
+		usage: 'Usage: /cfcore <input>'
+		aliases: [cfc, coldfyrecore]
