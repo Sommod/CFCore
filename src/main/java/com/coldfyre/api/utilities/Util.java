@@ -22,5 +22,26 @@ public class Util {
 	public static String[] wordWarpAsArray(String input, int words) {
 		return wordWarp(input, words).split("\n");
 	}
+	
+	public static String combineArray(String[] input, String limiter) {
+		String ret = "";
+		
+		for(String s : input)
+			ret += (s + limiter);
+		
+		return ret;
+	}
+	
+	public static boolean isAny(boolean ignoreCase, String input, String... compareTo) {
+		if(compareTo.length == 0)
+			return false;
+		
+		for(String s : compareTo) {
+			if(ignoreCase ? s.equalsIgnoreCase(input) : s.equals(input))
+				return true;
+		}
+		
+		return false;
+	}
 
 }
