@@ -410,17 +410,19 @@ public class TabCompleterBuilder {
 			List<String> calc = new ArrayList<String>();
 			List<String> temp = commands.get(args.length == 0 ? 0 + "_" + cmd.toLowerCase() : args.length + "_" + args[args.length - 1]);
 			
-			for(String line : temp) {
-				if(line.startsWith("playerinfo+")) {
-					String[] details = line.split("+");
-					Players.PLAYERS_LETTER[] ltrs = new Players.PLAYERS_LETTER[details.length - 2];
-					
-					for(int i = 0; i + 2 < details.length; i++)
-						ltrs[i] = Players.PLAYERS_LETTER.getLetter(details[i + 2]);
-					
-					calc.addAll(playerToString(Players.getFlag(details[1]).getPlayers(ltrs)));
-				} else
-					calc.add(line);
+			if(temp != null) {
+				for(String line : temp) {
+					if(line.startsWith("playerinfo+")) {
+						String[] details = line.split("+");
+						Players.PLAYERS_LETTER[] ltrs = new Players.PLAYERS_LETTER[details.length - 2];
+						
+						for(int i = 0; i + 2 < details.length; i++)
+							ltrs[i] = Players.PLAYERS_LETTER.getLetter(details[i + 2]);
+						
+						calc.addAll(playerToString(Players.getFlag(details[1]).getPlayers(ltrs)));
+					} else
+						calc.add(line);
+				}
 			}
 			
 			return calc.isEmpty() ? null : calc;
