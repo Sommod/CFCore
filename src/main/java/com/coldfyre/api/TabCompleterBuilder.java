@@ -83,9 +83,9 @@ public class TabCompleterBuilder {
 				for(Players.PLAYERS_LETTER ltr : letter) {
 					String[] details = line.split("+");
 					
-					if(details.length == 2) 					// playerinfo_{playerFlag}
+					if(details.length == 2)
 						line += ("+" + ltr.name());
-					else { 										// playerinfo_{playerFlag}_?_?_?_?_?
+					else {
 						boolean hit = false;
 						
 						for(String l : details) {
