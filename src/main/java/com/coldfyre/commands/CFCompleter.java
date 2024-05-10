@@ -1,4 +1,4 @@
-package com.coldfyre;
+package com.coldfyre.commands;
 
 import java.util.List;
 
