@@ -1,5 +1,7 @@
 package com.coldfyre.api.manager;
 
+import java.util.logging.Level;
+
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**
@@ -14,11 +16,26 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class PluginManager<J extends JavaPlugin> {
 	
 	protected J javaPlugin;
+	protected String[] header, footer;
 	
 	public PluginManager(J plugin) {
 		javaPlugin = plugin;
 	}
 	
 	protected J getPlugin() { return javaPlugin; }
-
+	
+	public String[] getHeader() { return header; }
+	public String[] getFooter() { return footer; }
+	public void printHeader() { print(header); }
+	public void printFooter() { print(footer); }
+	public void setHeader(String... header) { this.header = header; }
+	public void setFooter(String... footer) { this.footer = footer; }
+	
+	public void print(String... lines) { javaPlugin.getServer().getConsoleSender().sendMessage(lines); }
+	public void printWarning(String... lines) { printLogger(Level.WARNING, lines); }
+	public void printError(String... lines) { printLogger(Level.SEVERE, lines); }
+	private void printLogger(Level lvl, String... lines) {
+		for(String s : lines)
+			javaPlugin.getLogger().log(lvl, s);
+	}
 }
