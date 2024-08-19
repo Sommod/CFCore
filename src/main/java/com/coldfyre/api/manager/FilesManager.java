@@ -8,10 +8,12 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.ConsoleCommandSender;
@@ -157,6 +159,41 @@ public class FilesManager {
 	}
 	
 	/**
+	 * Gets the entire list of files that are stored within this FilesManager class. This
+	 * will only return the files portion of this class; any folders that may exist within
+	 * this class will not be return.
+	 * This is simply the File object and the file itself may not exist.
+	 * 
+	 * @return File Array
+	 */
+	public File[] getAllFiles() { return (File[]) files.values().toArray(); }
+	
+	/**
+	 * Gets the entire list of folders that are stored wtihin this FilesManager class. This
+	 * will return only the folders within this class.
+	 * This is simply the File object and the file (folder) itself may not exist.
+	 * 
+	 * @return File Array (Folders Only)
+	 */
+	public File[] getAllFolders() { return (File[]) folders.values().toArray(); }
+	
+	/**
+	 * Gets all the Names attached to the List of Files. Each file has a unique name (Key) that
+	 * is returned in a set.
+	 * 
+	 * @return Set of Key names for files
+	 */
+	public Set<String> getFileKeys() { return files.keySet(); }
+	
+	/**
+	 * Gets all the Names atteched to the List of Folders. Each folder has a unique name (Key) that
+	 * is returned in a set.
+	 * 
+	 * @return Set of Key names for folders
+	 */
+	public Set<String> getFolderKeys() { return folders.keySet(); }
+	
+	/**
 	 * Adds a Folder to this class and makes the directory. Note that the path MUST
 	 * include the folder name that'll be used in the file system.
 	 * 
@@ -199,7 +236,7 @@ public class FilesManager {
 	 * this does not check if the file exists within the file system, only that it's registered
 	 * within this class.
 	 * 
-	 * @param name - NAme of key to check file
+	 * @param name - Name of key to check file
 	 * @return TRUE - If file exists within this class
 	 */
 	public boolean isFile(String name) { return files.containsKey(name); }
@@ -230,6 +267,51 @@ public class FilesManager {
 	 * @return TRUE - if file was removed from both the file system and this class
 	 */
 	public boolean deleteFile(String name) { return deleteItem(false, name); }
+	
+	/**
+	 * This method will ensure that all folder stored within this object will be made. Accessing
+	 * files that don't exist will cause IO Errors. As such, it is suggested that this method
+	 * always be ran during the initialization of your plugin, ensuring that all paths are created
+	 * for any IO you may do. This will only create the folders, no files will be created. To have
+	 * all files created, use the {@link #createAllFiles()} method. 
+	 * 
+	 * @return True - If all folders were created successfully
+	 */
+	public boolean mkdirs() {
+		boolean check = true;
+		
+		for(File f : folders.values()) {
+			if(!f.mkdirs())
+				check = false;
+		}
+		
+		return check;
+	}
+	
+	/**
+	 * This will create all files (and folders they are in) that are stored within this manager. However,
+	 * note that while this will create the files, this does not load any data into the file. You can load
+	 * any data into the file using the method {@link #writeToFile(String, File)} or {@link #writeToFile(String, String)}.
+	 * 
+	 * @return True - If all files were created successfully
+	 */
+	public boolean createAllFiles() {
+		boolean check = true;
+		
+		try {
+			for(File f : files.values()) {
+				if(!f.createNewFile())
+					check = false;
+			}
+		} catch (IOException e) {
+			if(plugin == null)
+				LogException(pluginManager, e);
+			else
+				LogException(plugin, e);
+		}
+		
+		return check;
+	}
 	
 	/**
 	 * Writes the given data from the String into the file. Note that if the file already exists,
@@ -268,9 +350,9 @@ public class FilesManager {
 	 * Note that this will overwrite any data if the file already exists and contains data within it. This is similar
 	 * to the {@link #writeToFile(String, String)} method, but uses a file to import the data and output to another file.
 	 * (Basically acts like a copy data from-file-to-file).
-	 * @param name
-	 * @param fileData
-	 * @return
+	 * @param name - Name of file (key) to write data do
+	 * @param fileData - Data to write to the file
+	 * @return True - If the data was written to the file
 	 */
 	public boolean writeToFile(String name, File fileData) {
 		if(!files.containsKey(name))
@@ -289,8 +371,87 @@ public class FilesManager {
 			while((i = bis.read(bytes)) >= 0)
 				bos.write(bytes);
 			
-			bos.flush();
 			bis.close();
+			
+			return true;
+		} catch (IOException e) {
+			if(plugin == null)
+				LogException(pluginManager, e);
+			else
+				LogException(plugin, e);
+			return false;
+		}
+	}
+	
+	/**
+	 * Writes the given data <strong>FROM</strong> the InputStream <strong>TO</strong> the file name within this class.
+	 * Note that this will overwrite any data that exists already within the file. This method is a third option for files
+	 * that are obtained using other various methods that don't exist outside of an additional file. This will automatically
+	 * close the InputStream after use, regardless of whether the method succeeds or fails. This is to ensure that the memory
+	 * usage for the Stream is released for other data.
+	 * 
+	 * @param name - Name of file stored within this class
+	 * @param is - InputStream of data to write
+	 * @return True - All data was written to the file
+	 */
+	public boolean writeToFile(String name, InputStream is) {
+		if(!files.containsKey(name))
+			return false;
+		
+		try(BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(files.get(name)))) {
+			if(!files.get(name).exists())
+				files.get(name).createNewFile();
+			
+			byte[] bytes = new byte[1024];
+			
+			@SuppressWarnings("unused")
+			int i;
+			
+			while((i = is.read(bytes)) >= 0)
+				bos.write(bytes);
+			
+			is.close();
+			return true;
+		} catch (IOException e) {
+			if(plugin == null)
+				LogException(pluginManager, e);
+			else
+				LogException(plugin, e);
+			return false;
+		} finally {
+			if(is != null) {
+				try {
+					is.close();
+				} catch (IOException e) {
+					if(plugin == null)
+						LogException(pluginManager, e);
+					else
+						LogException(plugin, e);
+					return false;
+				}
+			}
+		}
+	}
+	
+	/**
+	 * Writes the given data <strong>FROM</strong> the ByteArray given <strong>TO</strong> the file name within this class.
+	 * Note that this will overwrite any data that exists already within the file. An alternative when using InputStreams as
+	 * the method for writing data.
+	 * 
+	 * @param name - File name (key)
+	 * @param byteArray - Array of bytes to write to file
+	 * @return True - If data was written
+	 */
+	public boolean writeToFile(String name, byte[] byteArray) {
+		if(!files.containsKey(name))
+			return false;
+		
+		try(BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(files.get(name)))) {
+			if(!files.get(name).exists())
+				files.get(name).createNewFile();
+			
+			bos.write(byteArray);
+			
 			return true;
 		} catch (IOException e) {
 			if(plugin == null)
