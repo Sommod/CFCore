@@ -20,8 +20,8 @@ import com.coldfyre.api.utilities.InvalidFileFormatException;
  */
 public abstract class AbstractConfig {
 	
-	private YamlConfiguration bukkitConfig;
-	private File bukkitFile;
+	protected YamlConfiguration bukkitConfig;
+	protected File bukkitFile;
 	
 	public AbstractConfig(String path) {
 		this(new File(path));
