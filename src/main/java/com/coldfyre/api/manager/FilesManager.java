@@ -196,7 +196,7 @@ public class FilesManager {
 	/**
 	 * Adds a Folder to this class and makes the directory. Note that the path MUST
 	 * include the folder name that'll be used in the file system. By default, the
-	 * starting path for this method will be in the <strong>Plugin Folder</strong>.
+	 * starting path for this method will be in the <strong>Plugin Data Folder</strong>.
 	 * 
 	 * <br><br>eg.<strong> {@code FilesManager.addFolder("player_data_folder", "path/to/folder")}</strong><br><br>
 	 * In this scenario, the <i>path/to/folder</i> will result in the folder called 'folder' while the name
@@ -211,7 +211,7 @@ public class FilesManager {
 	/**
 	 * Adds a file to this class and makes the file. Note that the path MUST include
 	 * the filename that'll be used in the file system. By default, the starting
-	 * path for this method will be in the <strong>Plugin Folder</strong>.
+	 * path for this method will be in the <strong>Plugin Data Folder</strong>.
 	 * 
 	 * <br><br>eg.<strong> {@code FilesManager.addFile("this_is_a_name", "path/to/file.yml")}</strong><br><br>
 	 * In this scenario, the <i>path/to/file.yml</i> will result in a file called 'file.yml' while the name
