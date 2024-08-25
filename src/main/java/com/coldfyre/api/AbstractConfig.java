@@ -20,24 +20,26 @@ import com.coldfyre.api.utilities.InvalidFileFormatException;
  */
 public abstract class AbstractConfig {
 	
-	protected YamlConfiguration bukkitConfig;
-	protected File bukkitFile;
+	protected YamlConfiguration[] bukkitConfig;
+	protected File[] bukkitFile;
 	
 	public AbstractConfig(String path) {
 		this(new File(path));
 	}
 	
-	public AbstractConfig(File ymlFile) {
-		bukkitFile = ymlFile;
+	public AbstractConfig(File... ymlFiles) {
+		bukkitFile = ymlFiles;
 		
-		try {
-			if(!FilenameUtils.getExtension(bukkitFile.getAbsolutePath()).equals("yml"))
-				throw new InvalidFileFormatException("The given file is not a YML file and cannot be configured.");
-		} catch (Exception e) {
-			FilesManager.LogException(e);
+		for(int i = 0; i < bukkitFile.length; i++) {
+			try {
+				if(!FilenameUtils.getExtension(bukkitFile[i].getAbsolutePath()).equals("yml"))
+					throw new InvalidFileFormatException("The given file is not a YML file and cannot be configured.");
+			} catch (Exception e) {
+				FilesManager.LogException(e);
+			}
+			
+			bukkitConfig[i] = YamlConfiguration.loadConfiguration(bukkitFile[i]);
 		}
-		
-		bukkitConfig = YamlConfiguration.loadConfiguration(bukkitFile);
 	}
 	
 	/**
@@ -45,7 +47,9 @@ public abstract class AbstractConfig {
 	 * 
 	 * @return {@link File}
 	 */
-	protected File getFile() { return bukkitFile; }
+	protected File getFile() { return bukkitFile[0]; }
+	
+	protected File getFile(int value) { return bukkitFile[value]; }
 	
 	/**
 	 * Gets the 'Raw' stored YamlConfiguration object for this object. Note that
@@ -54,5 +58,7 @@ public abstract class AbstractConfig {
 	 * 
 	 * @return {@link YamlConfigurtion}
 	 */
-	protected YamlConfiguration getYamlConfiguration() { return bukkitConfig; }
+	protected YamlConfiguration getYamlConfiguration() { return bukkitConfig[0]; }
+	
+	protected YamlConfiguration getYamlConfiguration(int value) { return bukkitConfig[value]; }
 }
