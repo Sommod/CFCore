@@ -101,8 +101,7 @@ public class FilesManager {
 				return false;
 			
 			folders.put(name, toAdd);
-			toAdd.mkdirs();
-			return true;
+			return toAdd.mkdirs();
 		} else {
 			if(files.containsKey(name))
 				return false;
@@ -110,7 +109,7 @@ public class FilesManager {
 			files.put(name, toAdd);
 			
 			try {
-				toAdd.createNewFile();
+				return toAdd.createNewFile();
 			} catch (IOException e) {
 				if(plugin == null)
 					LogException(pluginManager, e);
@@ -120,8 +119,6 @@ public class FilesManager {
 				files.remove(name);
 				return false;
 			}
-			
-			return true;
 		}
 	}
 	
@@ -269,6 +266,55 @@ public class FilesManager {
 	 * @return TRUE - if file was removed from both the file system and this class
 	 */
 	public boolean deleteFile(String name) { return deleteItem(false, name); }
+	
+	/**
+	 * This removes all data pertaining to folders within this object. Note that this
+	 * will not delete them from the system, only the reference to them from this object.
+	 * In a similar fashion, this clears the data as {@link Set} object.
+	 * 
+	 * @return True - If folder references are removed
+	 */
+	public boolean clearFolders() {
+		folders.clear();
+		
+		return folders.isEmpty();
+	}
+	
+	/**
+	 * This removes all data pertaining to files within this object. Note that his
+	 * will not delete them from the system, only the reference to them from this object.
+	 * This acts similar to that of {@link Set} objects.
+	 * 
+	 * @return True - If file references were removed
+	 */
+	public boolean clearFiles() {
+		files.clear();
+		
+		return files.isEmpty();
+	}
+	
+	/**
+	 * Clears the stored information of this object. Any folder(s) or file(s) that are saved within
+	 * this object are removed. This is equivalent to creating a new <strong>this</strong> object and
+	 * removing the current object from memory. If the clearing of all data within this object is
+	 * successful, then this method will return true, otherwise false as well as storing any error(s)
+	 * that occurred within the basic Error Log Folder.
+	 * 
+	 * @return True - If folder/files are removed
+	 */
+	public boolean clear() {
+		boolean check = false;
+		
+		if(clearFolders()) {
+			if(clearFiles())
+				check = true;
+			else
+				LogException(new Exception("Error, could not remove all data from the FilesManager object (FilesManager still contains file references)."));
+		} else
+			LogException(new Exception("Error, could not remove all data from the FilesManager object (FilesManager still contains folder references)."));
+		
+		return check;	
+	}
 	
 	/**
 	 * This method will ensure that all folder stored within this object will be made. Accessing

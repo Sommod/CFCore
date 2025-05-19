@@ -9,7 +9,7 @@ main: com.coldfyre.CFCore
 author: Sommod
 
 # Optional Information
-description: Library Plugin
+description: A Library Plugin for CF plugins.
 api-version: 1.20.5
 load: STARTUP
 prefix: CFCore

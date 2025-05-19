@@ -46,12 +46,26 @@ public class Util {
 		return time;
 	}
 	
+	/**
+	 * Intakes a single String object and adds newline values into specific locations based on the number
+	 * of words per line. This is to help condense long descriptive text into smaller <i>paragraph like</i>
+	 * format. The length is not determined by the number of characters, but rather the number of words. This
+	 * will not split the string, but rather add to it; should you desire to split based on the word wrapping,
+	 * use the {@link #wordWarpAsArray(String, int)} method.
+	 * 
+	 * To word wrap based on character number, see {@link #wordWarp(String, int, boolean)}.
+	 * 
+	 * @see #wordWarpAsArray(String, int)
+	 * @param input - String text input
+	 * @param words - number of words per line
+	 * @return String - String input with escape sequences (\n).
+	 */
 	public static String wordWarp(String input, int words) {
 		String[] split = input.trim().split(" ");
 		String result = split[0];
 		
 		for(int i = 1; i < split.length; i++) {
-			if((i + 1) % 13 == 0)
+			if((i + 1) % words == 0)
 				result = result.concat("\n");
 			
 			if(!result.endsWith("\n"))
@@ -63,25 +77,53 @@ public class Util {
 		return result;
 	}
 	
+	/**
+	 * Intakes a String object and converts it into a String array. The String object of each index will
+	 * contain at most the numerical value of the parameter <b>words</b>. In similarity to <i>wordWarp</i>,
+	 * this simple returns the altered value into an array.
+	 * 
+	 * @param input - String text input
+	 * @param words - number of words per line
+	 * @return String[] - String array of word warp
+	 */
 	public static String[] wordWarpAsArray(String input, int words) {
 		return wordWarp(input, words).split("\n");
 	}
 	
+	/**
+	 * Given an array, a String is returned with the delimiter used as the spacing between each index. If no
+	 * delimiter is to be added in between each of the String objects, then set the <i>limiter</i> parameter
+	 * to NULL.
+	 * 
+	 * @param input - String Array
+	 * @param limiter - Delimiter to add (Can be null)
+	 * @return String - Object of combined array into single String Object
+	 */
 	public static String combineArray(String[] input, String limiter) {
 		String ret = "";
 		
 		for(String s : input)
-			ret += (s + limiter);
+			ret += (s + limiter == null ? "" : limiter);
 		
 		return ret;
 	}
 	
+	/**
+	 * Simple method for checking if the String object is the same as any of the given comparisons. If one
+	 * of the given comparisons is the same as the input, then this will return true. There are two options,
+	 * checking with and without casing.
+	 * 
+	 * @param ignoreCase - Require if Case-Sensitive is necessary for comparison
+	 * @param input - String input
+	 * @param compareTo - Comparisons for input
+	 * @return True - if input matches at least one comparison, otherwise false
+	 */
 	public static boolean isAny(boolean ignoreCase, String input, String... compareTo) {
 		if(compareTo.length == 0)
 			return false;
 		
 		for(String s : compareTo) {
-			if(ignoreCase ? s.equalsIgnoreCase(input) : s.equals(input))
+			if(ignoreCase ? s.equalsIgnoreCase(input) : s == input)
 				return true;
 		}
 		
